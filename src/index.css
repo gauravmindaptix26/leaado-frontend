@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Ensure the app always fills the viewport without showing extra page background */
+html,
+body,
+#root {
+  height: 100%;
+  background: transparent !important;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
