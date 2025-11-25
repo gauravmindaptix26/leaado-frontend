@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { FiX, FiUploadCloud, FiCheck, FiTrash2, FiUpload } from "react-icons/fi";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+import api from "../api/axios";
+
 const ACCEPTED_FILE_TYPES = ".csv,.pdf,.xls,.xlsx";
 
 const FileActionButton = ({ children, className = "", ...props }) => (
@@ -40,13 +41,8 @@ export default function BulkLeadsModal({ open, onClose }) {
   const fetchLeads = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/leads`);
-      const data = await response.json();
-      if (response.ok) {
-        setLeads(data.leads || []);
-      } else {
-        console.error(data.message);
-      }
+      const { data } = await api.get("/api/leads");
+      setLeads(data.leads || []);
     } catch (error) {
       console.error("Unable to load leads", error);
     } finally {
@@ -61,14 +57,9 @@ export default function BulkLeadsModal({ open, onClose }) {
 
     try {
       setUploading(true);
-      const response = await fetch(`${API_BASE_URL}/api/leads/upload`, {
-        method: "POST",
-        body: formData
+      const { data } = await api.post("/api/leads/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to upload files");
-      }
       setLeads((prev) => [...data.leads, ...prev]);
       showFeedback("Files uploaded successfully");
     } catch (error) {
@@ -93,12 +84,9 @@ export default function BulkLeadsModal({ open, onClose }) {
 
   const handleDelete = async (leadId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}`, {
-        method: "DELETE"
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Unable to delete lead");
+      const { data } = await api.delete(`/api/leads/${leadId}`);
+      if (!data?.success) {
+        throw new Error(data?.message || "Unable to delete lead");
       }
       setLeads((prev) => prev.filter((lead) => lead._id !== leadId));
       showFeedback("Lead removed");
@@ -124,14 +112,9 @@ export default function BulkLeadsModal({ open, onClose }) {
 
     try {
       setSaving(true);
-      const response = await fetch(`${API_BASE_URL}/api/leads/import`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ link: importLink.trim() })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Unable to save link");
+      const { data } = await api.post("/api/leads/import", { link: importLink.trim() });
+      if (!data?.success) {
+        throw new Error(data?.message || "Unable to save link");
       }
       setLeads((prev) => [data.lead, ...prev]);
       setImportLink("");

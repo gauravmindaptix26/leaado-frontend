@@ -1,6 +1,7 @@
 import React from "react";
 import logo from "../assets/logo.png";   // <-- FIXED PATH
 
+
 export default function Footer() {
   return (
     <footer className="w-full border-t bg-white/60 py-4 sm:py-6 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">

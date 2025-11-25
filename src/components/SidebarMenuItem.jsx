@@ -1,4 +1,7 @@
+import { LuCircle } from "react-icons/lu";
+
 export default function SidebarMenuItem({ label, icon: Icon, active, onClick }) {
+  const RenderIcon = Icon || LuCircle;
   return (
     <button
       type="button"
@@ -12,7 +15,7 @@ export default function SidebarMenuItem({ label, icon: Icon, active, onClick }) 
       <span className={`text-lg sm:text-xl flex-shrink-0 flex items-center justify-center ${
         active ? "text-white" : "text-blue-500"
       }`}>
-        <Icon />
+        <RenderIcon />
       </span>
       <span className="text-left truncate">{label}</span>
     </button>

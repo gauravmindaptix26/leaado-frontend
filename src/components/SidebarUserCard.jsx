@@ -32,7 +32,7 @@ export default function SidebarUserCard() {
     <div className="flex flex-col items-center text-center mt-6 sm:mt-8">
       <div className="relative w-28 sm:w-40 h-28 sm:h-40 mb-3 sm:mb-4">
         <div
-          className={`absolute inset-0 rounded-full bg-gradient-to-br ${sticker.gradient} opacity-80 blur-sm animate-pulse`}
+          className={`absolute inset-0 rounded-full bg-gradient-to-br ${sticker.gradient} opacity-80 animate-pulse`}
         />
         <div className="absolute inset-3 rounded-full bg-white shadow-xl flex items-center justify-center text-4xl sm:text-6xl">
           <span className={isSettled ? "" : "animate-bounce"}>{sticker.emoji}</span>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import { FiUser, FiMail, FiPhone, FiLock, FiLayers, FiGlobe, FiChevronDown } from "react-icons/fi";
 
 const initialValues = {
@@ -36,24 +37,19 @@ export default function SignupForm() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          mobile: formData.mobile,
-          country: formData.country
-        })
+      const { data } = await api.post("/api/auth/signup", {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        mobile: formData.mobile,
+        country: formData.country
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Signup failed");
+      if (!data?.success) {
+        throw new Error(data?.message || "Signup failed");
       }
 
-      setMessage("Account created! Redirecting to login...");
+      setMessage("Account created! Please log in.");
       setFormData(initialValues);
       setTimeout(() => navigate("/"), 800);
     } catch (err) {
@@ -215,7 +211,7 @@ export default function SignupForm() {
         disabled={isSubmitting}
         className="w-full bg-[#0c80ff] hover:bg-[#0a74e6] disabled:opacity-60 disabled:cursor-not-allowed transition py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base"
       >
-        {isSubmitting ? "Processing..." : "LOGIN"}
+        {isSubmitting ? "Processing..." : "SIGNUP"}
       </button>
 
       <p className="text-center text-xs sm:text-sm text-gray-200 mt-2.5">

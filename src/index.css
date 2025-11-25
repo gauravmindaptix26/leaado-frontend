@@ -12,3 +12,11 @@ body {
   margin: 0;
   overflow: hidden;
 }
+
+/* Hide scrollbars but keep scrolling */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}

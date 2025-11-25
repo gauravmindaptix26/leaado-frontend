@@ -1,23 +1,8 @@
 import SidebarUserCard from "./SidebarUserCard";
 import SidebarMenuItem from "./SidebarMenuItem";
 import logo from "../assets/Logo.png";
-import {
-  LuLayoutDashboard,
-  LuFolderClosed,
-  LuFileText,
-  LuCreditCard,
-  LuSettings
-} from "react-icons/lu";
 
-const navItems = [
-  { label: "Dashboard", icon: LuLayoutDashboard },
-  { label: "Leads", icon: LuFolderClosed },
-  { label: "Pitch Templates", icon: LuFileText },
-  { label: "Subscriptions", icon: LuCreditCard },
-  { label: "Settings", icon: LuSettings }
-];
-
-export default function Sidebar({ onLogout, activeItem = "Dashboard", onSelect }) {
+export default function Sidebar({ onLogout, activeItem = "Dashboard", onSelect, navItems = [] }) {
   const handleSelect = (label) => {
     onSelect?.(label);
   };
