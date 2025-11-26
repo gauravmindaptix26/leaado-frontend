@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/logo.png";   // <-- FIXED PATH
+import logo from "../assets/Logo.png";   // <-- FIXED PATH
 
 export default function Footer() {
   return (
