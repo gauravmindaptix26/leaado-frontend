@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import bg from "../assets/background.jpg";
 import SignupForm from "../components/SignupForm";
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 
 export default function SignupPage() {
   return (

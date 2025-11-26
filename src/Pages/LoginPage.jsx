@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import api from "../api/axios";
 
 import bg from "../assets/background.jpg";
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 import LoginForm from "../components/LoginForm";
 
 export default function LoginPage() {
