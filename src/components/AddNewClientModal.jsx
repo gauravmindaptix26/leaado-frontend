@@ -29,6 +29,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
 
   const handleSubmitUrls = async () => {
     setError("");
+
     const sites = urlsInput
       .split(/[\n,]+/g)
       .map((s) => s.trim())
@@ -47,7 +48,9 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
         message,
         website: sourceWebsite
       });
+
       if (!data?.success) return;
+
       onAddWebsites?.(data.leads || []);
       setUrlsInput("");
       setFullName("");
@@ -57,6 +60,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
       setMessage("");
       setSourceWebsite("");
       onClose?.();
+
     } catch (err) {
       console.error("Failed to save websites", err);
       setError(err?.response?.data?.message || err.message || "Unable to save leads. Please try again.");
@@ -66,25 +70,35 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-2 sm:px-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center px-2 sm:px-4 py-6">
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-4xl rounded-2xl bg-white shadow-2xl max-h-[90vh]">
-        <div className="flex flex-col md:flex-row h-full">
-          <div className="flex-1 px-4 sm:px-6 py-5 overflow-y-auto modal-scroll max-h-[calc(90vh-40px)]">
+      {/* Modal Box */}
+      <div className="relative z-10 w-full max-w-4xl rounded-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
+
+        {/* Modal Inner Scroll Area */}
+        <div className="flex flex-col md:flex-row">
+
+          {/* LEFT SIDE CONTENT */}
+          <div className="flex-1 px-4 sm:px-6 py-5">
+
+            {/* Header */}
             <div className="bg-[#0047A6] text-white rounded-2xl px-5 py-3 flex items-center justify-between">
               <h2 className="text-xl font-semibold">Add New Client</h2>
-              <button type="button" onClick={onClose} aria-label="Close modal">
+              <button type="button" onClick={onClose}>
                 ✕
               </button>
             </div>
 
+            {/* Error */}
             {error && (
               <div className="mt-3 rounded-lg border border-red-200 bg-red-50 text-red-600 text-sm px-4 py-2">
                 {error}
               </div>
             )}
 
+            {/* URL Input */}
             <div>
               <textarea
                 rows="4"
@@ -95,7 +109,9 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
               />
             </div>
 
+            {/* FORM GRID */}
             <div className="mt-5 grid gap-4 md:grid-cols-4 text-sm text-gray-600">
+
               <label className="font-medium col-span-1">Full Name</label>
               <div className="col-span-3">
                 <input
@@ -103,7 +119,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                   placeholder="Enter full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
@@ -114,7 +130,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                   placeholder="Enter link or URL of the website"
                   value={sourceWebsite}
                   onChange={(e) => setSourceWebsite(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
@@ -139,14 +155,14 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                   placeholder="Enter email address"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
               <label className="font-medium col-span-1">Select Service</label>
               <div className="col-span-3 relative">
                 <select
-                  className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   value={service}
                   onChange={(e) => setService(e.target.value)}
                 >
@@ -157,13 +173,16 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                 </select>
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">⌄</span>
               </div>
+
             </div>
 
+            {/* NOTE */}
             <div className="mt-4 rounded-xl bg-blue-50 text-blue-700 px-4 py-3 text-sm font-medium">
               NOTE: Your 5 free leads will be auto-tracked in your trial.
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* BUTTONS */}
+            <div className="mt-6 flex flex-wrap gap-3 pb-4">
               <button
                 type="button"
                 onClick={handleSubmitUrls}
@@ -172,6 +191,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
               >
                 {submitting ? "Processing..." : "START LEAD GENERATION"}
               </button>
+
               <button
                 type="button"
                 onClick={() => onAddBulk?.()}
@@ -179,6 +199,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
               >
                 ADD BULK LEADS
               </button>
+
               <button
                 type="button"
                 onClick={onClose}
@@ -189,6 +210,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
             </div>
           </div>
 
+          {/* RIGHT SIDE IMAGE */}
           <div className="md:w-64 bg-gradient-to-b from-[#F5F9FF] to-[#E3EDFF] border-l border-blue-100 hidden md:flex items-center justify-center p-4">
             <img src={logoIllustration} alt="Client onboarding" className="w-32 h-auto" />
           </div>
