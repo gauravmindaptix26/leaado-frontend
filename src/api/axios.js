@@ -3,7 +3,7 @@ import axios from "axios";
 // Resolve backend URL:
 // 1) VITE_API_URL if set
 // 2) Default to http://localhost:5000 to ensure API calls work after refresh
-const baseURL = import.meta?.env?.VITE_API_URL || "https://leaado-backend-yi3h.vercel.app";
+const baseURL = import.meta?.env?.VITE_API_URL || "https://leaado-backend-tgij.vercel.app/";
 
 const api = axios.create({
   baseURL,
