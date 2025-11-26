@@ -73,7 +73,7 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
     <div className="fixed inset-0 z-50 flex items-start justify-center px-2 sm:px-4 py-6">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-4xl rounded-2xl bg-white shadow-2xl max-h-[90vh] overflow-hidden">
+      <div className="relative z-10 w-full max-w-4xl rounded-2xl bg-white shadow-2xl h-[90vh] overflow-hidden">
         <div className="flex flex-col md:flex-row h-full">
           <div className="flex-1 px-4 sm:px-6 py-5 overflow-y-auto modal-scroll">
 
