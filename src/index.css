@@ -20,3 +20,13 @@ body {
 *::-webkit-scrollbar {
   display: none;
 }
+
+/* Hide scrollbar for modal content but allow touch scroll */
+.modal-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.modal-scroll::-webkit-scrollbar {
+  display: none;
+}

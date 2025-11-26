@@ -66,12 +66,12 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 sm:px-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-2 sm:px-4">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       <div className="relative z-10 w-full max-w-4xl rounded-2xl bg-white shadow-2xl overflow-hidden max-h-[90vh]">
         <div className="flex flex-col md:flex-row h-full">
-          <div className="flex-1 px-6 sm:px-8 py-6 overflow-y-auto">
+          <div className="flex-1 px-4 sm:px-6 py-5 overflow-y-auto modal-scroll">
             <div className="bg-[#0047A6] text-white rounded-2xl px-5 py-3 flex items-center justify-between">
               <h2 className="text-xl font-semibold">Add New Client</h2>
               <button type="button" onClick={onClose} aria-label="Close modal">
