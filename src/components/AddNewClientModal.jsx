@@ -32,12 +32,15 @@ export default function AddNewClientModal({
 
   if (!open) return null;
 
+  // ⭐ Phone validation
+  const isPhoneValid = /^[0-9]{10}$/.test(contactPhone);
+
   // ⭐ ALL REQUIRED FIELD VALIDATION
   const isFormValid =
     urlsInput.trim() !== "" &&
     fullName.trim() !== "" &&
     contactEmail.trim() !== "" &&
-    contactPhone.trim() !== "" &&
+    isPhoneValid &&
     sourceWebsite.trim() !== "" &&
     service.trim() !== "" &&
     service !== "Select one of the option";
@@ -46,7 +49,7 @@ export default function AddNewClientModal({
     setError("");
 
     if (!isFormValid) {
-      setError("Please fill all required fields before submitting.");
+      setError("Please fill all fields correctly before submitting.");
       return;
     }
 
@@ -164,17 +167,29 @@ export default function AddNewClientModal({
               {/* Phone */}
               <label className="font-medium col-span-1">Phone No. *</label>
               <div className="col-span-3">
-                <div className="flex rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+                <div className={`flex rounded-xl border px-0 bg-gray-50 overflow-hidden 
+                  ${!isPhoneValid && contactPhone.length > 0 ? "border-red-400" : "border-gray-200"}`}>
                   <span className="px-4 py-3 text-gray-500 border-r border-gray-200">+91</span>
                   <input
-                    type="tel"
+                    type="text"
+                    maxLength="10"
                     required
-                    placeholder="Enter Mobile Number"
+                    placeholder="Enter 10-digit Mobile Number"
                     value={contactPhone}
-                    onChange={(e) => setContactPhone(e.target.value)}
+                    onChange={(e) => {
+                      const onlyDigits = e.target.value.replace(/\D/g, "");
+                      setContactPhone(onlyDigits);
+                    }}
                     className="flex-1 px-4 py-3 bg-transparent placeholder-gray-400 focus:outline-none"
                   />
                 </div>
+
+                {/* Phone validation text */}
+                {!isPhoneValid && contactPhone.length > 0 && (
+                  <p className="text-red-500 text-xs mt-1">
+                    Phone number must be exactly 10 digits.
+                  </p>
+                )}
               </div>
 
               {/* Email */}
@@ -222,8 +237,8 @@ export default function AddNewClientModal({
                 className={`flex-1 min-w-[180px] py-3 rounded-lg font-semibold shadow transition 
                   ${!isFormValid || submitting
                     ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                    : "bg-[#0061FF] text-white hover:bg-[#004fd1]"}
-                `}
+                    : "bg-[#0061FF] text-white hover:bg-[#004fd1]"
+                  }`}
               >
                 {submitting ? "Processing..." : "START LEAD GENERATION"}
               </button>
@@ -244,6 +259,7 @@ export default function AddNewClientModal({
                 CANCEL
               </button>
             </div>
+
           </div>
 
           {/* RIGHT IMAGE */}
