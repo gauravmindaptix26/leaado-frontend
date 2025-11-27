@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/axios";
 
 export default function SettingsSection({ onClose }) {
@@ -8,27 +8,35 @@ export default function SettingsSection({ onClose }) {
     phone: "",
     currentPassword: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [originalProfile, setOriginalProfile] = useState(null);
 
-  // ⭐ Fetch logged-in user profile when settings open
+  // Fetch logged-in user profile when settings open
   useEffect(() => {
     const fetchProfile = async () => {
+      setError("");
       try {
         const { data } = await api.get("/api/users/profile");
-
         if (data?.success && data?.user) {
-          setForm((prev) => ({
-            ...prev,
+          const incomingProfile = {
             fullName: data.user.fullName || "",
             email: data.user.email || "",
-            phone: data.user.phone || ""
+            phone: data.user.phone || data.user.mobile || "",
+          };
+
+          setOriginalProfile(incomingProfile);
+          setForm((prev) => ({
+            ...prev,
+            ...incomingProfile,
           }));
+        } else {
+          setError(data?.message || "Unable to load your profile.");
         }
       } catch (err) {
         console.error("Profile fetch failed:", err);
@@ -39,12 +47,11 @@ export default function SettingsSection({ onClose }) {
     };
 
     fetchProfile();
-  }, []); // run only once when opened
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // ⭐ Phone number allow only digits + max 10 digits
     if (name === "phone") {
       const cleaned = value.replace(/\D/g, "");
       if (cleaned.length > 10) return;
@@ -60,6 +67,16 @@ export default function SettingsSection({ onClose }) {
     setError("");
     setMessage("");
 
+    if (form.phone && form.phone.length !== 10) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    if (form.newPassword && !form.currentPassword) {
+      setError("Enter your current password to set a new password.");
+      return;
+    }
+
     if (form.newPassword && form.newPassword !== form.confirmPassword) {
       setError("New password and confirmation do not match.");
       return;
@@ -71,20 +88,26 @@ export default function SettingsSection({ onClose }) {
       const { data } = await api.put("/api/users/profile", {
         fullName: form.fullName,
         email: form.email,
-        phone: form.phone,
+        phone: form.phone || undefined,
         currentPassword: form.currentPassword || undefined,
-        newPassword: form.newPassword || undefined
+        newPassword: form.newPassword || undefined,
       });
 
       if (data?.success) {
-        setMessage("Profile updated successfully.");
+        const updatedUser = {
+          fullName: data.user?.fullName ?? form.fullName,
+          email: data.user?.email ?? form.email,
+          phone: data.user?.phone ?? form.phone,
+        };
 
-        // Clear password fields
+        setMessage(data?.message || "Profile updated successfully.");
+        setOriginalProfile(updatedUser);
         setForm((prev) => ({
           ...prev,
+          ...updatedUser,
           currentPassword: "",
           newPassword: "",
-          confirmPassword: ""
+          confirmPassword: "",
         }));
       } else {
         setError(data?.message || "Update failed");
@@ -99,15 +122,12 @@ export default function SettingsSection({ onClose }) {
 
   if (fetching) {
     return (
-      <div className="p-6 text-center text-gray-600">
-        Loading your profile...
-      </div>
+      <div className="p-6 text-center text-gray-600">Loading your profile...</div>
     );
   }
 
   return (
     <div className="bg-white rounded-xl border border-blue-100 shadow-lg p-4 sm:p-6 max-w-4xl w-full mx-auto relative">
-      
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -115,7 +135,8 @@ export default function SettingsSection({ onClose }) {
             Profile Settings
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Update your personal details. Leave password fields empty if you do not want to change your password.
+            Update your personal details. Leave password fields empty if you do
+            not want to change your password.
           </p>
         </div>
 
@@ -125,7 +146,7 @@ export default function SettingsSection({ onClose }) {
             onClick={onClose}
             className="text-gray-500 hover:text-gray-800 transition rounded-full p-2"
           >
-            ✕
+            X
           </button>
         )}
       </div>
@@ -145,15 +166,18 @@ export default function SettingsSection({ onClose }) {
 
       {/* FORM */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        
         {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Full Name
             </label>
+            {originalProfile?.fullName && (
+              <p className="text-xs text-gray-500 mb-1">
+                Current: {originalProfile.fullName}
+              </p>
+            )}
             <input
               type="text"
               name="fullName"
@@ -169,6 +193,11 @@ export default function SettingsSection({ onClose }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
+            {originalProfile?.email && (
+              <p className="text-xs text-gray-500 mb-1">
+                Current: {originalProfile.email}
+              </p>
+            )}
             <input
               type="email"
               name="email"
@@ -186,6 +215,11 @@ export default function SettingsSection({ onClose }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number
             </label>
+            {originalProfile && (
+              <p className="text-xs text-gray-500 mb-1">
+                Current: {originalProfile.phone || "Not set"}
+              </p>
+            )}
             <input
               type="text"
               name="phone"
@@ -196,17 +230,20 @@ export default function SettingsSection({ onClose }) {
               className="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
             {form.phone && form.phone.length !== 10 && (
-              <p className="text-red-500 text-xs mt-1">Phone number must be 10 digits.</p>
+              <p className="text-red-500 text-xs mt-1">
+                Phone number must be 10 digits.
+              </p>
             )}
           </div>
         </div>
 
         {/* Password Change */}
         <div className="border-t border-gray-200 pt-4">
-          <h3 className="text-sm font-semibold text-gray-800 mb-3">Change Password</h3>
+          <h3 className="text-sm font-semibold text-gray-800 mb-3">
+            Change Password
+          </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
             {/* Current Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
