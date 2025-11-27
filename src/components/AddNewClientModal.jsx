@@ -14,7 +14,12 @@ const niches = [
   "Other"
 ];
 
-export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddBulk }) {
+export default function AddNewClientModal({
+  open,
+  onClose,
+  onAddWebsites,
+  onAddBulk
+}) {
   const [urlsInput, setUrlsInput] = useState("");
   const [fullName, setFullName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -27,18 +32,37 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
 
   if (!open) return null;
 
+  // ⭐ ALL REQUIRED FIELD VALIDATION
+  const isFormValid =
+    urlsInput.trim() !== "" &&
+    fullName.trim() !== "" &&
+    contactEmail.trim() !== "" &&
+    contactPhone.trim() !== "" &&
+    sourceWebsite.trim() !== "" &&
+    service.trim() !== "" &&
+    service !== "Select one of the option";
+
   const handleSubmitUrls = async () => {
     setError("");
+
+    if (!isFormValid) {
+      setError("Please fill all required fields before submitting.");
+      return;
+    }
 
     const sites = urlsInput
       .split(/[\n,]+/g)
       .map((s) => s.trim())
       .filter(Boolean);
 
-    if (sites.length === 0) return;
+    if (sites.length === 0) {
+      setError("Enter at least one website URL.");
+      return;
+    }
 
     try {
       setSubmitting(true);
+
       const { data } = await api.post("/api/leads/bulk", {
         urls: sites,
         name: fullName,
@@ -49,9 +73,14 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
         website: sourceWebsite
       });
 
-      if (!data?.success) return;
+      if (!data?.success) {
+        setError("Something went wrong while saving leads.");
+        return;
+      }
 
       onAddWebsites?.(data.leads || []);
+
+      // Clear fields
       setUrlsInput("");
       setFullName("");
       setContactEmail("");
@@ -59,11 +88,15 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
       setService("");
       setMessage("");
       setSourceWebsite("");
-      onClose?.();
 
+      onClose?.();
     } catch (err) {
       console.error("Failed to save websites", err);
-      setError(err?.response?.data?.message || err.message || "Unable to save leads. Please try again.");
+      setError(
+        err?.response?.data?.message ||
+        err.message ||
+        "Unable to save leads. Please try again."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -80,12 +113,10 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
             {/* Header */}
             <div className="bg-[#0047A6] text-white rounded-2xl px-5 py-3 flex items-center justify-between">
               <h2 className="text-xl font-semibold">Add New Client</h2>
-              <button type="button" onClick={onClose}>
-                ✕
-              </button>
+              <button type="button" onClick={onClose}>✕</button>
             </div>
 
-            {/* Error */}
+            {/* Error Box */}
             {error && (
               <div className="mt-3 rounded-lg border border-red-200 bg-red-50 text-red-600 text-sm px-4 py-2">
                 {error}
@@ -93,23 +124,23 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
             )}
 
             {/* URL Input */}
-            <div>
-              <textarea
-                rows="4"
-                placeholder="Enter target URLs, one per line (or comma separated)"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 mt-4"
-                value={urlsInput}
-                onChange={(e) => setUrlsInput(e.target.value)}
-              />
-            </div>
+            <textarea
+              rows="4"
+              placeholder="Enter target URLs, one per line (or comma separated)"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 mt-4"
+              value={urlsInput}
+              onChange={(e) => setUrlsInput(e.target.value)}
+            />
 
-            {/* FORM GRID */}
+            {/* FORM */}
             <div className="mt-5 grid gap-4 md:grid-cols-4 text-sm text-gray-600">
 
-              <label className="font-medium col-span-1">Full Name</label>
+              {/* Full Name */}
+              <label className="font-medium col-span-1">Full Name *</label>
               <div className="col-span-3">
                 <input
                   type="text"
+                  required
                   placeholder="Enter full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -117,23 +148,27 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                 />
               </div>
 
-              <label className="font-medium col-span-1">Website Link or URL</label>
+              {/* Website */}
+              <label className="font-medium col-span-1">Website URL *</label>
               <div className="col-span-3">
                 <input
                   type="url"
-                  placeholder="Enter link or URL of the website"
+                  required
+                  placeholder="Enter the website URL"
                   value={sourceWebsite}
                   onChange={(e) => setSourceWebsite(e.target.value)}
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
 
-              <label className="font-medium col-span-1">Phone No.</label>
+              {/* Phone */}
+              <label className="font-medium col-span-1">Phone No. *</label>
               <div className="col-span-3">
                 <div className="flex rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
                   <span className="px-4 py-3 text-gray-500 border-r border-gray-200">+91</span>
                   <input
                     type="tel"
+                    required
                     placeholder="Enter Mobile Number"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
@@ -142,10 +177,12 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                 </div>
               </div>
 
-              <label className="font-medium col-span-1">Email Address</label>
+              {/* Email */}
+              <label className="font-medium col-span-1">Email Address *</label>
               <div className="col-span-3">
                 <input
                   type="email"
+                  required
                   placeholder="Enter email address"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
@@ -153,9 +190,11 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                 />
               </div>
 
-              <label className="font-medium col-span-1">Select Service</label>
+              {/* Service */}
+              <label className="font-medium col-span-1">Select Service *</label>
               <div className="col-span-3 relative">
                 <select
+                  required
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
                   value={service}
                   onChange={(e) => setService(e.target.value)}
@@ -167,7 +206,6 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
                 </select>
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">⌄</span>
               </div>
-
             </div>
 
             {/* NOTE */}
@@ -180,8 +218,12 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
               <button
                 type="button"
                 onClick={handleSubmitUrls}
-                disabled={submitting}
-                className="flex-1 min-w-[180px] bg-[#0061FF] text-white py-3 rounded-lg font-semibold shadow hover:bg-[#004fd1] transition disabled:opacity-60"
+                disabled={!isFormValid || submitting}
+                className={`flex-1 min-w-[180px] py-3 rounded-lg font-semibold shadow transition 
+                  ${!isFormValid || submitting
+                    ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                    : "bg-[#0061FF] text-white hover:bg-[#004fd1]"}
+                `}
               >
                 {submitting ? "Processing..." : "START LEAD GENERATION"}
               </button>
@@ -204,10 +246,11 @@ export default function AddNewClientModal({ open, onClose, onAddWebsites, onAddB
             </div>
           </div>
 
-          {/* RIGHT SIDE IMAGE */}
+          {/* RIGHT IMAGE */}
           <div className="md:w-64 bg-gradient-to-b from-[#F5F9FF] to-[#E3EDFF] border-l border-blue-100 hidden md:flex items-center justify-center p-4">
             <img src={logoIllustration} alt="Client onboarding" className="w-32 h-auto" />
           </div>
+
         </div>
       </div>
     </div>
